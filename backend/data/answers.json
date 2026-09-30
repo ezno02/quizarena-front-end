@@ -1,0 +1,68 @@
+[
+  {
+    "answerId": "answer_1790725460407",
+    "userId": "user-murilo",
+    "questionId": "q-zelda",
+    "answer": "The Legend of Zelda",
+    "status": "checked",
+    "accepted": true,
+    "points": 100,
+    "message": "Resposta correta!",
+    "createdAt": "2026-09-29T23:44:20.407Z"
+  },
+  {
+    "answerId": "answer_1790725851701",
+    "userId": "user-murilo",
+    "questionId": "q-portal",
+    "answer": "bd",
+    "status": "checked",
+    "accepted": false,
+    "points": 0,
+    "message": "Resposta não reconhecida.",
+    "createdAt": "2026-09-29T23:50:51.701Z"
+  },
+  {
+    "answerId": "answer_1790726217927",
+    "userId": "user-murilo",
+    "questionId": "q-portal",
+    "answer": "aaaaaaaaaaa",
+    "status": "checked",
+    "accepted": false,
+    "points": 0,
+    "message": "Resposta não reconhecida.",
+    "createdAt": "2026-09-29T23:56:57.927Z"
+  },
+  {
+    "answerId": "answer_1790726227744",
+    "userId": "user-murilo",
+    "questionId": "q-android",
+    "answer": "ma",
+    "status": "checked",
+    "accepted": false,
+    "points": 0,
+    "message": "Resposta não reconhecida.",
+    "createdAt": "2026-09-29T23:57:07.744Z"
+  },
+  {
+    "answerId": "answer_1790726231951",
+    "userId": "user-murilo",
+    "questionId": "q-zelda",
+    "answer": "ca",
+    "status": "checked",
+    "accepted": false,
+    "points": 0,
+    "message": "Resposta não reconhecida.",
+    "createdAt": "2026-09-29T23:57:11.951Z"
+  },
+  {
+    "answerId": "answer_1790726235368",
+    "userId": "user-murilo",
+    "questionId": "q-zelda",
+    "answer": "co",
+    "status": "checked",
+    "accepted": false,
+    "points": 0,
+    "message": "Resposta não reconhecida.",
+    "createdAt": "2026-09-29T23:57:15.368Z"
+  }
+]

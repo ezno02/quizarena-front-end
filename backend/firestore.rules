@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// O Quiz Arena nunca conversa direto do navegador com o Firestore: o backend
+// Express usa o Admin SDK e é o único dono dos dados. O cliente só fala com a
+// API, o que garante que `correctAnswer` e o cálculo de pontuação nunca sejam
+// expuestos ou alterados pelo cliente.
+//
+// Se algum dia o front usar o SDK do Firebase diretamente (ex.: login),
+// libere apenas `players` para leitura do próprio usuário, nunca `questions`.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

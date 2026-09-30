@@ -54,13 +54,27 @@ button {
   background: rgba(5, 15, 29, 0.88);
 }
 
+/* Botões do cabeçalho: "Atualizar rodada" e "Trocar nickname". */
+.header-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-actions-row .secondary-button {
+  padding: 7px 11px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 252px minmax(0, 1fr) 312px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 390px);
   gap: 22px;
-  max-width: 1440px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 28px clamp(20px, 4vw, 58px) 18px;
+  align-items: start;
 }
 
 .panel,
@@ -602,27 +616,27 @@ button {
 
 @media (max-width: 1100px) {
   .dashboard-grid {
-    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-columns: 1fr;
   }
 
   .dashboard-grid > aside:last-child {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 
   .dashboard-grid > aside:last-child .rank-row {
-    display: inline-flex;
-    width: calc(50% - 5px);
-    margin-right: 5px;
+    display: flex;
+    width: 100%;
+    margin-right: 0;
   }
 
   .dashboard-grid > aside:last-child .my-rank {
-    display: inline-flex;
-    width: calc(50% - 5px);
-    margin-left: 5px;
+    display: flex;
+    width: 100%;
+    margin-left: 0;
   }
 
   .dashboard-grid > aside:last-child .search-box {
-    max-width: 360px;
+    max-width: none;
   }
 }
 
