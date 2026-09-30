@@ -7,16 +7,25 @@
 import cors from 'cors'
 import express from 'express'
 
-import { RANKING_LIMIT } from './config.js'
+import {
+  APP_TIMEZONE,
+  BASE_POINTS_PER_QUESTION,
+  CRON_SECRET,
+  DAILY_QUESTION_COUNT,
+  RANKING_LIMIT,
+  isFirebaseConfigured,
+  missingFirebaseVars,
+} from './config.js'
+import { timingSafeEqual } from 'node:crypto'
+
 import { buildRoundProgress, registrarResposta } from './services/answers.js'
+import { getApp } from './firebase.js'
 import { findOrCreatePlayer, getPlayer, toPublicPlayer } from './services/players.js'
 import { getRanking, searchPlayer } from './services/ranking.js'
 import { ensureDailyRound, loadRoundQuestionDocs } from './services/rounds.js'
 import { normalizeQuestion, toPublicQuestion } from './services/questionService.js'
 import { createPlayerToken, getAuthenticatedPlayerId } from './services/session.js'
 import { getDayKey } from './services/time.js'
-import { CRON_SECRET } from './config.js'
-import { timingSafeEqual } from 'node:crypto'
 
 const app = express()
 
@@ -76,24 +85,34 @@ function toRoundSummary(round, questionCount) {
 }
 
 app.get('/api/health', (req, res) => {
-  const configured = isFirebaseConfiguredSafe()
+  const configured = isFirebaseConfigured()
+
+  // `getApp()` falha rápido se a chave não for uma service account, o que
+  // transforma "tem .env" em "tem .env válido".
+  let connected = false
+  let firebaseError = null
+
+  if (configured) {
+    try {
+      getApp()
+      connected = true
+    } catch (error) {
+      firebaseError = error.message
+    }
+  }
 
   res.json({
     ok: true,
     service: 'quiz-arena-backend',
-    firebase: configured,
+    firebase: configured ? (connected ? 'connected' : 'invalid-credentials') : 'not-configured',
+    ...(firebaseError ? { firebaseError } : {}),
     dayKey: getDayKey(),
-    timezone: process.env.APP_TIMEZONE || 'America/Sao_Paulo',
-    dailyQuestionCount: 7,
+    timezone: APP_TIMEZONE,
+    dailyQuestionCount: DAILY_QUESTION_COUNT,
+    basePointsPerQuestion: BASE_POINTS_PER_QUESTION,
     rankingLimit: RANKING_LIMIT,
   })
 })
-
-function isFirebaseConfiguredSafe() {
-  return ['FIREBASE_PROJECT_ID', 'FIREBASE_CLIENT_EMAIL', 'FIREBASE_PRIVATE_KEY'].every(
-    (key) => Boolean(process.env[key]?.trim()),
-  )
-}
 
 /**
  * "Pesquisar nickname" + criação de player.

@@ -8,6 +8,7 @@
     "start": "node server.js",
     "daily": "node scripts/daily.js",
     "check:firebase": "node scripts/check-firebase.js",
+    "setup:firebase": "node scripts/setup-service-account.js",
     "test": "node --no-deprecation tests/run.js && node --no-deprecation tests/integration.js && node --no-deprecation tests/http.js"
   },
   "dependencies": {

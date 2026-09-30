@@ -41,6 +41,22 @@ export function isFirebaseConfigured() {
   return missingFirebaseVars().length === 0
 }
 
+/**
+ * Normaliza a chave privada.
+ *
+ * O `.json` da service account traz a chave com `\n` literais, que precisa
+ * virar quebra de linha real. dependendo de como o `.env` foi escrito, o valor
+ * também pode chegar com aspas, espaços nas pontas ou quebras já convertidas —
+ * por isso os dois replaces e o trim.
+ */
+export function normalizePrivateKey(value) {
+  return String(value ?? '')
+    .trim()
+    .replace(/^["']|["']$/g, '')
+    .trim()
+    .replace(/\\r\\n|\\n|\\r/g, '\n')
+}
+
 export function getFirebaseCredentials() {
   if (!isFirebaseConfigured()) {
     return null
@@ -49,6 +65,6 @@ export function getFirebaseCredentials() {
   return {
     projectId: process.env.FIREBASE_PROJECT_ID.trim(),
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL.trim(),
-    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    privateKey: normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY),
   }
 }

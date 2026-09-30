@@ -16,6 +16,7 @@ import {
   missingFirebaseVars,
 } from './config.js'
 import app from './app.js'
+import { getApp } from './firebase.js'
 import { ensureDailyRound } from './services/rounds.js'
 import { isEphemeralSecret } from './services/session.js'
 import { getDayKey } from './services/time.js'
@@ -36,6 +37,15 @@ export async function boot() {
         'As rotas de dados respondem 503 até o backend/.env estar preenchido.',
     )
   } else {
+    // Chamar getApp() aqui transforma credencial inválida em erro de boot, com a
+    // mensagem na tela, em vez de um 500 na hora de o player clicar em "Entrar".
+    try {
+      getApp()
+    } catch (error) {
+      console.error(`[quiz-arena] Credenciais do Firebase inválidas: ${error.message}`)
+      console.error('[quiz-arena] Rode "npm run check:firebase" para o diagnóstico completo.')
+    }
+
     try {
       const { dayKey, round, finalized } = await ensureDailyRound()
       console.log(

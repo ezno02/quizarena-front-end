@@ -9,11 +9,7 @@
 import { cert, getApps, initializeApp } from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
 
-import {
-  isFirebaseConfigured,
-  missingFirebaseVars,
-  getFirebaseCredentials,
-} from '../config.js'
+import { getFirebaseCredentials, isFirebaseConfigured, missingFirebaseVars } from '../config.js'
 import { getDayKey } from '../services/time.js'
 
 function titulo(texto) {
@@ -44,9 +40,27 @@ for (const key of ['FIREBASE_PROJECT_ID', 'FIREBASE_CLIENT_EMAIL', 'FIREBASE_PRI
 }
 
 const emailValido = /\.iam\.gserviceaccount\.com$/.test(process.env.FIREBASE_CLIENT_EMAIL ?? '')
+
 if (process.env.FIREBASE_CLIENT_EMAIL && !emailValido) {
   console.log('\n  AVISO: FIREBASE_CLIENT_EMAIL nao termina em .iam.gserviceaccount.com.')
   console.log('          O Admin SDK exige uma service account, nao um e-mail de usuario.')
+}
+
+// Puxa o diagnóstico mais provável: config do SDK Web em vez de service account.
+const pareceConfigWeb =
+  (process.env.FIREBASE_PRIVATE_KEY ?? '').startsWith('AIza') ||
+  (process.env.FIREBASE_CLIENT_EMAIL ?? '').includes('@') &&
+    !(process.env.FIREBASE_CLIENT_EMAIL ?? '').includes('.iam.gserviceaccount.com')
+
+if (pareceConfigWeb) {
+  console.log('\n  DIAGNOSTICO: estas credenciais parecem ser do Firebase Web SDK')
+  console.log('  (apiKey + authDomain + appId), que sao publicas e servem ao navegador.')
+  console.log('  O backend precisa da service account, que nao esta nesse config.')
+  console.log('')
+  console.log('  Como obter:')
+  console.log('    1. Firebase console > Project settings > Service accounts')
+  console.log('    2. "Generate new private key" > baixa um .json')
+  console.log('    3. npm run setup:firebase -- caminho/para/o-arquivo.json')
 }
 
 if (!isFirebaseConfigured()) {

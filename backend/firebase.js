@@ -4,7 +4,11 @@
 import { cert, getApps, initializeApp } from 'firebase-admin'
 import { FieldValue, getFirestore as getAdminFirestore } from 'firebase-admin/firestore'
 
-import { getFirebaseCredentials, isFirebaseConfigured, missingFirebaseVars } from './config.js'
+import {
+  getFirebaseCredentials,
+  isFirebaseConfigured,
+  missingFirebaseVars,
+} from './config.js'
 
 /**
  * Em testes, `tests/firestoreStub.js` registra o stub e define
@@ -36,7 +40,36 @@ export function getApp() {
     throw error
   }
 
-  return initializeApp({ credential: cert(getFirebaseCredentials()) })
+  const credentials = getFirebaseCredentials()
+
+  // Falhar aqui, no boot, é melhor do que descobrir no primeiro clique do
+  // player: o `initializeApp` só validaria a chave na primeira transação e a
+  // tela mostraria um 500 genérico.
+  if (!credentials.privateKey.includes('-----BEGIN')) {
+    const error = new Error(
+      'FIREBASE_PRIVATE_KEY não parece uma chave de service account: falta o cabeçalho ' +
+        '"-----BEGIN PRIVATE KEY-----". Se for uma API key do Firebase Web (começa com AIza), ' +
+        'baixe a service account em Project settings > Service accounts. ' +
+        'Diagnóstico: "npm run check:firebase".',
+    )
+    error.status = 503
+    error.code = 'FIREBASE_BAD_CREDENTIALS'
+    throw error
+  }
+
+  if (!credentials.clientEmail.endsWith('.iam.gserviceaccount.com')) {
+    const error = new Error(
+      `FIREBASE_CLIENT_EMAIL ("${credentials.clientEmail}") não é uma service account. ` +
+        'O Admin SDK espera algo como ' +
+        '"firebase-adminsdk-xxxxx@seu-projeto.iam.gserviceaccount.com". ' +
+        'Diagnóstico: "npm run check:firebase".',
+    )
+    error.status = 503
+    error.code = 'FIREBASE_BAD_CREDENTIALS'
+    throw error
+  }
+
+  return initializeApp({ credential: cert(credentials) })
 }
 
 export function getFirestore() {

@@ -14,6 +14,7 @@ cada resposta é calculado à meia-noite comparando todos os players.
 ## Key workflows
 - Frontend: `npm install` e `npm run dev` (porta 3000, faz proxy de `/api` para 4002).
 - Backend: `cd backend`, `npm install`, `npm run dev` (porta 4002).
+- Diagnóstico do Firebase: `cd backend && npm run check:firebase` (não escreve nada).
 - Script Diário (cronjob 00h00): `cd backend && npm run daily`.
 - Testes: `cd backend && npm test` (não precisa de credenciais).
 - Build: `npm run build`.
@@ -49,6 +50,15 @@ cada resposta é calculado à meia-noite comparando todos os players.
   instrução de rodar `npm run daily`.
 
 ## Common pitfalls
+- **Credenciais do Firebase**: o Admin SDK exige **service account**
+  (`...@projeto.iam.gserviceaccount.com` + chave PEM). API key do Firebase Web
+  (`AIza...`) **não** funciona. Antes de investigar qualquer `500`, rodar
+  `npm run check:firebase`.
+- **Imports do firebase-admin**: usar os entrypoints nomeados —
+  `import { cert, getApps, initializeApp } from 'firebase-admin'` e
+  `import { FieldValue, getFirestore } from 'firebase-admin/firestore'`.
+  O import default **não** expõe `apps`, `credential` nem `firestore`, e
+  `admin.apps[0]` quebra com "Cannot read properties of undefined".
 - **Erro em rota async sem wrapper**: o Express 4 não captura rejeição de Promise.
   Toda rota nova precisa do `asyncRoute` de [backend/app.js](backend/app.js), ou a
   requisição fica pendurada e o front carrega para sempre.
